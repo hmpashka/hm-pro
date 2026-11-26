@@ -1,0 +1,12 @@
+{
+  "name": "HM Pro · copie des licences (15 min)",
+  "nodes": [
+    { "parameters": { "rule": { "interval": [ { "field": "minutes", "minutesInterval": 15 } ] } },
+      "name": "Toutes les 15 min", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 0] },
+    { "parameters": { "method": "POST", "url": "https://pro.hmphotographie.fr/api/interne/licences/instantane",
+                      "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth", "options": { "timeout": 30000 } },
+      "name": "Copier les licences", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [260, 0] }
+  ],
+  "connections": { "Toutes les 15 min": { "main": [ [ { "node": "Copier les licences", "type": "main", "index": 0 } ] ] } },
+  "settings": { "executionOrder": "v1" }
+}

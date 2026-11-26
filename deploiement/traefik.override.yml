@@ -1,0 +1,20 @@
+# À utiliser SEULEMENT si les ports 80/443 du VPS sont déjà pris par le Traefik du modèle n8n de Hostinger.
+# Copier en docker-compose.override.yml, remplacer RESEAU_TRAEFIK (docker network ls) et NOM_RESOLVER (voir le
+# docker-compose de n8n : certificatesresolvers.<nom>), puis : docker compose up -d --build app db
+# Traefik pose lui-même X-Real-Ip (IP du visiteur), que l'appli utilise.
+services:
+  caddy:
+    profiles: [ "desactive" ]          # Caddy n'est pas lancé : Traefik fait le HTTPS
+  app:
+    networks: [ interne, web, traefik ]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=RESEAU_TRAEFIK
+      - traefik.http.routers.hmpro.rule=Host(`pro.hmphotographie.fr`)
+      - traefik.http.routers.hmpro.entrypoints=websecure
+      - traefik.http.routers.hmpro.tls.certresolver=NOM_RESOLVER
+      - traefik.http.services.hmpro.loadbalancer.server.port=3000
+networks:
+  traefik:
+    external: true
+    name: RESEAU_TRAEFIK

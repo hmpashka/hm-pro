@@ -1,0 +1,46 @@
+# Tableau de bord pro : caddy (HTTPS) -> app (Next.js) -> db (PostgreSQL, jamais exposée).
+# Réseau « hmpro » séparé de celui de n8n ; n8n appelle seulement https://pro.hmphotographie.fr/api/interne/... avec son jeton.
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hmpro
+      POSTGRES_USER: hmpro
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?à mettre dans .env}
+    volumes: [ "db:/var/lib/postgresql/data" ]
+    networks: [ interne ]
+    healthcheck: { test: [ "CMD-SHELL", "pg_isready -U hmpro" ], interval: 10s, retries: 10 }
+
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://hmpro:${POSTGRES_PASSWORD}@db:5432/hmpro
+    depends_on: { db: { condition: service_healthy } }
+    networks: [ interne, web ]
+    read_only: true
+    tmpfs: [ /tmp ]
+    security_opt: [ "no-new-privileges:true" ]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: [ "80:80", "443:443" ]
+    volumes:
+      - ./deploiement/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    env_file: .env
+    depends_on: [ app ]
+    networks: [ web ]
+
+networks:
+  interne: { internal: true }   # la base n'a aucun accès à Internet
+  web: {}
+
+volumes:
+  db: {}
+  caddy_data: {}
+  caddy_config: {}

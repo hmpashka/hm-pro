@@ -1,0 +1,20 @@
+{
+  "name": "HM Pro · licences à traiter (chaque matin)",
+  "nodes": [
+    { "parameters": { "rule": { "interval": [ { "field": "days", "triggerAtHour": 8 } ] } },
+      "name": "Chaque matin 8 h", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 0] },
+    { "parameters": { "url": "https://pro.hmphotographie.fr/api/interne/licences/a-traiter",
+                      "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth", "options": { "timeout": 30000 } },
+      "name": "Licences à traiter", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [240, 0] },
+    { "parameters": { "jsCode": "const d = $input.first().json;\nconst lignes = [];\nfor (const p of d.produits) {\n  for (const c of p.essais_finis) lignes.push(`• ${p.nom} : essai terminé sans activation : ${c.nom} (${c.mail})`);\n  for (const c of p.expirent_30j) lignes.push(`• ${p.nom} : expire le ${c.fin.slice(0,10)} : ${c.nom} (${c.mail})`);\n}\nif (!lignes.length) return [];\nreturn [{ json: { sujet: `HM Pro : ${lignes.length} licence(s) à traiter`, texte: lignes.join('\\n') + '\\n\\nhttps://pro.hmphotographie.fr/licences' } }];" },
+      "name": "Résumé", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [480, 0] },
+    { "parameters": { "sendTo": "A_REMPLACER_PAR_TON_MAIL", "subject": "={{ $json.sujet }}", "emailType": "text", "message": "={{ $json.texte }}", "options": {} },
+      "name": "Mail à Hugo", "type": "n8n-nodes-base.gmail", "typeVersion": 2.1, "position": [720, 0] }
+  ],
+  "connections": {
+    "Chaque matin 8 h": { "main": [ [ { "node": "Licences à traiter", "type": "main", "index": 0 } ] ] },
+    "Licences à traiter": { "main": [ [ { "node": "Résumé", "type": "main", "index": 0 } ] ] },
+    "Résumé": { "main": [ [ { "node": "Mail à Hugo", "type": "main", "index": 0 } ] ] }
+  },
+  "settings": { "executionOrder": "v1", "timezone": "Europe/Paris" }
+}
