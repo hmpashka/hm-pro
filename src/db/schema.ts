@@ -99,3 +99,14 @@ export const licenceInstantane = pgTable("licence_instantane", {
   bloques: integer("bloques").notNull(),
   contenuC: text("contenu_c").notNull(),
 }, (t) => [index("licence_instantane_idx").on(t.produit, t.t)]);
+
+/** Suivi d'un dépôt GitHub dans l'onglet Projets. Prochaine étape et note chiffrées. */
+export const projet = pgTable("projet", {
+  depot: text("depot").primaryKey(), // propriétaire/nom
+  statut: text("statut").notNull().default("en_cours"),
+  priorite: text("priorite").notNull().default("normale"),
+  masque: boolean("masque").notNull().default(false),
+  contenuC: text("contenu_c"),
+  maj: timestamp("maj", { withTimezone: true }).notNull().defaultNow(),
+  majPar: text("maj_par"),
+});

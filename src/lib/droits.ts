@@ -1,7 +1,7 @@
 // Modules (onglets) et niveaux d'accès. Contrôlé côté serveur sur chaque page et chaque action.
 export const MODULES = [
   { code: "licences", nom: "Licences", pret: true },
-  { code: "projets", nom: "Projets", pret: false },
+  { code: "projets", nom: "Projets", pret: true },
   { code: "concours", nom: "Concours & CA", pret: false },
   { code: "agenda", nom: "Agenda", pret: false },
   { code: "factures", nom: "Factures", pret: false },
