@@ -2,11 +2,12 @@
 // Requêtes signées HMAC-SHA256 ; la clé ne circule jamais. Appelé uniquement côté serveur.
 import { createHash, createHmac, randomBytes } from "node:crypto";
 
-export type Produit = "hm-timings" | "gestovet" | "piquage";
+export type Produit = "hm-timings" | "gestovet" | "piquage" | "groompix";
 export const PRODUITS: { code: Produit; nom: string }[] = [
   { code: "hm-timings", nom: "HM TIMINGS" },
   { code: "gestovet", nom: "Gestovet" },
   { code: "piquage", nom: "Atelier Piquage" },
+  { code: "groompix", nom: "Groom Pix" },
 ];
 
 export type Poste = { id: string; nom: string; version: string; ip: string; vu: number; connecte?: boolean; bloque?: boolean };
