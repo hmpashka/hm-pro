@@ -7,7 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 DOSSIER=${SAUVEGARDE_DOSSIER:-/var/backups/hm-pro}
 API=${TELEGRAM_API:-https://api.telegram.org}
-lire() { grep -E "^$1=" .env | tail -1 | cut -d= -f2-; }
+lire() { grep -E "^$1=" .env | tail -1 | cut -d= -f2- || true; }
 CLE=$(lire SAUVEGARDE_AGE_CLE); TOKEN=$(lire SAUVEGARDE_TELEGRAM_TOKEN); CHAT=$(lire SAUVEGARDE_TELEGRAM_CHAT)
 [[ $CLE == age1* ]] || { echo "SAUVEGARDE_AGE_CLE manquante ou invalide dans .env" >&2; exit 1; }
 
