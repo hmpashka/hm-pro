@@ -1,5 +1,5 @@
 // Tables de Better Auth (connexion, sessions, 2FA, limites) + tables du tableau de bord.
-import { boolean, integer, bigint, jsonb, pgTable, primaryKey, serial, text, timestamp, index } from "drizzle-orm/pg-core";
+import { boolean, integer, bigint, date, jsonb, pgTable, primaryKey, serial, text, timestamp, index, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -110,3 +110,27 @@ export const projet = pgTable("projet", {
   maj: timestamp("maj", { withTimezone: true }).notNull().defaultNow(),
   majPar: text("maj_par"),
 });
+
+/** Concours couvert par HM Photographie. */
+export const concours = pgTable("concours", {
+  id: serial("id").primaryKey(),
+  nom: text("nom").notNull(),
+  lieu: text("lieu").notNull().default(""),
+  debut: date("debut").notNull(), // AAAA-MM-JJ
+  fin: date("fin").notNull(),
+  objectifCentimes: integer("objectif_centimes"),
+  note: text("note").notNull().default(""),
+  cree: timestamp("cree", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [index("concours_debut_idx").on(t.debut)]);
+
+/** Une vente (ou un total saisi d'un coup). Montant en centimes ; négatif pour un remboursement. */
+export const vente = pgTable("vente", {
+  id: serial("id").primaryKey(),
+  concoursId: integer("concours_id").notNull().references(() => concours.id, { onDelete: "cascade" }),
+  t: timestamp("t", { withTimezone: true }).notNull().defaultNow(),
+  moyen: text("moyen").notNull(), // especes | cb | en_ligne
+  centimes: integer("centimes").notNull(),
+  libelle: text("libelle").notNull().default(""),
+  ref: text("ref"), // identifiant externe (galerie en ligne) : jamais deux fois
+  saisiPar: text("saisi_par"),
+}, (t) => [index("vente_concours_idx").on(t.concoursId, t.t), uniqueIndex("vente_ref_idx").on(t.ref)]);

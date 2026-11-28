@@ -43,3 +43,7 @@ button.danger { color: var(--danger); }
 .message { padding: 10px 12px; border-radius: 8px; border: 1px solid currentColor; margin: 8px 0; }
 details > summary { cursor: pointer; }
 code.bloc { display: block; white-space: pre-wrap; word-break: break-all; padding: 10px; background: var(--fond); border-radius: 8px; }
+.saisie { display: grid; gap: 10px; }
+.saisie .montant { font-size: 1.6rem; padding: 12px; }
+.saisie .moyens { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.saisie .moyens button { padding: 14px 8px; font-size: 1.05rem; }

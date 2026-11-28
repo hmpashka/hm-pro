@@ -2,7 +2,7 @@
 export const MODULES = [
   { code: "licences", nom: "Licences", pret: true },
   { code: "projets", nom: "Projets", pret: true },
-  { code: "concours", nom: "Concours & CA", pret: false },
+  { code: "concours", nom: "Concours & CA", pret: true },
   { code: "agenda", nom: "Agenda", pret: false },
   { code: "factures", nom: "Factures", pret: false },
   { code: "relations", nom: "Relations", pret: false },
