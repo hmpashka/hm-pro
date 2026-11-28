@@ -10,6 +10,7 @@ API=${TELEGRAM_API:-https://api.telegram.org}
 lire() { grep -E "^$1=" .env | tail -1 | cut -d= -f2- || true; }
 CLE=$(lire SAUVEGARDE_AGE_CLE); TOKEN=$(lire SAUVEGARDE_TELEGRAM_TOKEN); CHAT=$(lire SAUVEGARDE_TELEGRAM_CHAT)
 [[ $CLE == age1* ]] || { echo "SAUVEGARDE_AGE_CLE manquante ou invalide dans .env" >&2; exit 1; }
+[[ -z $TOKEN || $TOKEN =~ ^[0-9]+:[A-Za-z0-9_-]+$ ]] || { echo "SAUVEGARDE_TELEGRAM_TOKEN invalide : seulement le token (ex. 123456:ABC...), sans espace ni autre mot" >&2; exit 1; }
 
 telegram() {  # message texte, sans jamais faire échouer la sauvegarde
   [[ -n $TOKEN && -n $CHAT ]] && curl -fsS -m 30 "$API/bot$TOKEN/sendMessage" --data-urlencode "chat_id=$CHAT" --data-urlencode "text=$1" >/dev/null || true
