@@ -2,6 +2,8 @@ import Link from "next/link";
 import { exigerSession } from "@/lib/session";
 import { modulesVisibles, peut } from "@/lib/droits";
 import { PRODUITS, comptes, resumer } from "@/lib/live";
+import { heureParis, jourParis } from "@/lib/agenda";
+import { agendaComplet } from "@/lib/agenda-hm";
 
 export const dynamic = "force-dynamic";
 
@@ -19,10 +21,27 @@ export default async function Accueil({ searchParams }: { searchParams: Promise<
   const { refus } = await searchParams;
   const modules = modulesVisibles(c.user, c.droits);
   const lic = peut(c.user, c.droits, "licences", "lecture") ? await resumeLicences() : null;
+  const maintenant = Date.now();
+  const ag = peut(c.user, c.droits, "agenda", "lecture")
+    ? await agendaComplet(c.user, c.droits, maintenant, maintenant + 7 * 86400_000).catch(() => null) : null;
+  const auj = jourParis(maintenant);
+  const quand = (ms: number) => { const j = jourParis(ms); return j === auj ? "Aujourd'hui" : new Date(ms).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Paris" }); };
   return (
     <>
       <h1>Bonjour {c.user.name.split(" ")[0]}</h1>
       {refus && <p className="message alerte">Vous n'avez pas accès à « {refus} ».</p>}
+      {ag && ag.regle && (
+        <>
+          <h2><Link href="/agenda" style={{ color: "inherit" }}>Prochains rendez-vous</Link></h2>
+          <div className="carte">
+            {ag.evenements.length === 0 ? <div className="doux">Rien dans les 7 prochains jours.</div> : ag.evenements.slice(0, 6).map((e) => (
+              <div key={e.id} className={"ligne-ev " + (e.n < 0 ? "agc" : "ag" + (e.n % 4))}>
+                <span className="heure">{e.debut < maintenant ? "En cours" : quand(e.debut)}{!e.journee && e.debut >= maintenant ? " " + heureParis(e.debut) : ""}</span>
+                <span>{e.lien ? <Link href={e.lien}>{e.titre}</Link> : e.titre}{e.lieu && <span className="doux petit"> · {e.lieu}</span>}</span>
+              </div>))}
+          </div>
+        </>
+      )}
       {lic && (
         <>
           <h2>Licences</h2>

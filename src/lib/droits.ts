@@ -3,7 +3,7 @@ export const MODULES = [
   { code: "licences", nom: "Licences", pret: true },
   { code: "projets", nom: "Projets", pret: true },
   { code: "concours", nom: "Concours & CA", pret: true },
-  { code: "agenda", nom: "Agenda", pret: false },
+  { code: "agenda", nom: "Agenda", pret: true },
   { code: "factures", nom: "Factures", pret: false },
   { code: "relations", nom: "Relations", pret: false },
 ] as const;
